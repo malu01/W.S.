@@ -1,0 +1,23 @@
+import requests
+url = "https://movie.douban.com/subject/27010768/?tag=热门&from=gaia"
+r = requests.get(url)
+print(r.status_code)  # 418
+print(r.request.headers)  # {'User-Agent': 'python-requests/2.22.0',
+# 需要更换头
+hd = {"User-Agent": "chrome/10"}
+r = requests.get( url, headers=hd)
+print(r.request.headers)  # {'User-Agent': 'chrome/10'
+print(r.status_code)  # 200
+print(r.text)
+
+
+# 框架结构
+url = "https://movie.douban.com/subject/27010768/?tag=热门&from=gaia"
+try:
+    kv  ={"User-Agent": "Mozilla/5.0"}
+    r = requests.get(url,headers = kv)
+    r.raise_for_status()
+    r.encoding = r.apparent_encoding
+    print(r.text)
+ except:
+    print("失败")
