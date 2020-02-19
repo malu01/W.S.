@@ -1,0 +1,17 @@
+import requests
+import os
+url = "https://www.sinaimg.cn/dy/slidenews/5_img/2015_48/30939_1300019_688168.jpg"
+#资源链接
+root = "D://pics//"
+path = root + url.split("/")[-1]
+print(path)
+if not os.path.exists(root):
+        os.mkdir(root)
+if not os.path.exists(path):
+        r = requests.get(url)
+        with open(path, "wb") as f:
+            f.write(r.content)  # 以二进制存储
+            f.close()
+            print("已保存")
+else:
+        print("已存在")
