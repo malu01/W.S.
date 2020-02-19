@@ -1,0 +1,19 @@
+import requests
+#百度搜索
+kv = {'wd': 'PYTHON'}
+r = requests.get("http://www.baidu.com/s", params=kv)
+print(r.status_code)  # 200
+print(r.request.url)  # 是百度的验证界面,无法打开
+print(len(r.text))
+
+# 360搜索
+keyword = "python"
+try:
+    kv = {'q' : keyword}
+    r = requests.get("http://www.so.com/s", params = kv)
+    print(r.request.url)
+    r.raise_for_status()
+    # 只输出前1000个字符
+    print(r.text[:1000])
+except:
+    print("爬取失败")
