@@ -1,0 +1,9 @@
+import  requests
+kv = {"ip":"223.12.226.91"}
+url = "http://www.ip138.com/iplookup.asp"
+try:
+    r = requests.get(url,params=kv)
+    r.encoding = r.apparent_encoding
+    print(r.text[7200:-2100])
+except:
+    print("爬取失败")
