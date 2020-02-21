@@ -21,10 +21,10 @@ def fillUnivList(ulist,html):
     pass  #不做操作
 
 def printUniverLIist(ulist,num):
-    print("{:^15}\t{:^15}\t{:^15}".format("排名","学校","总分"))
+    print("{:^10}\t{:^6}\t{:^10}".format("排名","学校","总分"))
     for i in range(num):
         u = ulist[i]
-        print("{:^15}\t{:^15}\t{:^15}".format(u[0],u[1],u[2]))
+        print("{:^10}\t{:^6}\t{:^10}".format(u[0],u[1],u[2]))
 
 
 def main():
@@ -32,6 +32,14 @@ def main():
     url = "http://www.zuihaodaxue.com/Greater_China_Ranking2019_1.html"
     html = getHTMLText(url)
     fillUnivList(uinfo, html)
-    printUniverLIist(uinfo, 100)
+    printUnivList(uinfo, 100)
 
 main()
+
+
+#  printUniverLIist函数的优化
+def printUnivList(ulist, num):
+    print("{0:^10}\t{1:{3}^10}\t{2:^10}".format("排名", "学校名称", "总分",chr(12288)))
+    for i in range(num):
+        u = ulist[i]
+        print("{0:^10}\t{1:{3}^10}\t{2:^10}".format(u[0], u[1], u[2],chr(12288)))
