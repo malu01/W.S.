@@ -1,0 +1,52 @@
+import re
+import requests
+
+def getHTMLText(url):
+    try:
+        hd = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36"}
+        r = requests.get(url,timeout=30,headers = hd)
+        r.raise_for_status()
+        r.encoding = r.apparent_encoding
+        return r.text
+    except:
+        return"爬取失败"
+
+
+def parsePage(ilt,html):
+    try:
+        plt = re.findall(r"<i>\d+\.\d+</i>",html)
+        tlt = re.findall(r"<em>[^-/￥|].+</em>",html)
+        if len(plt) == len(tlt):
+            for i in range(len(plt)):
+                price = eval(re.search(r"\d+\.\d+",plt[i]).group(0))
+                title = re.sub(r"<.+?>","",tlt[i])
+                ilt.append([price, title])
+        else:
+            print('信息不对称')
+    except:
+        print("爬取失败")
+       
+def printGoodsList(ilt):
+    tplt = "{:4}\t{:8}\t{:16}"
+    print(tplt.format("序号", "价格", "商品名称"))
+    count = 0
+    for g in ilt:
+        count = count + 1
+        print(tplt.format(count, g[0], g[1]))
+
+def main():
+    goods = "书包"
+    depth = 3
+    start_url = "https://search.jd.com/Search?keyword="+ goods+\
+                "&enc=utf-8&qrst=1&rt=1&stop=1&vt=2&wq=%E4%B9%A6%E5%8C%85&stock="
+    infoList = []
+    for i in range(depth):
+        try:
+            url = start_url + str(2*(i-1)+1) + "&page=1&s=" + str(2+(i-1)*50) + "&click=0"
+            html = getHTMLText(url)
+            parsePage(infoList,html)
+        except:
+            continue
+    printGoodsList(infoList)
+
+main()
