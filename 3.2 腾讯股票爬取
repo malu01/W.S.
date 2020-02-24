@@ -11,7 +11,6 @@ def getHTMLText(url):
         return r.text
     except:
         return ""
-
 def getStockList(lst,stockURL):
     html = getHTMLText(stockURL)
     soup = BeautifulSoup(html,"html.parser")
@@ -21,10 +20,9 @@ def getStockList(lst,stockURL):
             href = i.attrs["href"]
             href = re.findall(r".com/[s][hz]\d{6}",href)[0]
             lst.append(re.findall(r"\d{6}",href)[0])  #加了一个[0]变成了字符类型
-        except: 
+        except:  #若a标签中没有所需字符，则continue 避免异常
             continue
     return ""
-
 def getStockInfo(lst,stockURL,fpath):
     for stock in lst:
         url = stockURL + stock+"/gp"
@@ -32,13 +30,13 @@ def getStockInfo(lst,stockURL,fpath):
         try:
             soup = BeautifulSoup(html,"html.parser")
             stockinfo = soup.find("div",attrs={"class":"content clear"})
-            print(">")
             if stockinfo == None:
                     continue
             else:
                 List = stockinfo.find_all("span")[4:]
                 name = soup.find("h1", class_="col-1-1").string
-                double = ['股票名称: ', name.string.split()[0]]
+                double = ['股票名称: ', name.string.split()[0]] #把股票名称空格后面的其他内容删掉
+                for i in range(len(List)):
                     double.append(List[i].string)
                 for i in range(len(double)):
                     if double[i] == None:
@@ -48,7 +46,6 @@ def getStockInfo(lst,stockURL,fpath):
         except:
             traceback.print_exc()
             continue
-
 def main():
     stock_list_url = "http://quote.eastmoney.com/stock_list.html"
     stock_info_url = "http://gu.qq.com/sz"
@@ -56,6 +53,5 @@ def main():
     slist = []
     getStockList(slist,stock_list_url)
     getStockInfo(slist,stock_info_url,output_file)
-    print(slist)
 
 main()
