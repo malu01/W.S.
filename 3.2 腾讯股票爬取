@@ -1,0 +1,61 @@
+import re
+from bs4 import BeautifulSoup
+import requests
+import traceback
+
+def getHTMLText(url):
+    try:
+        r = requests.get(url,timeout = 30)
+        r.raise_for_status()
+        r.encoding = r.apparent_encoding
+        return r.text
+    except:
+        return ""
+
+def getStockList(lst,stockURL):
+    html = getHTMLText(stockURL)
+    soup = BeautifulSoup(html,"html.parser")
+    a = soup.find_all("a")  #寻找a标签中的股票代码
+    for i in a:
+        try:
+            href = i.attrs["href"]
+            href = re.findall(r".com/[s][hz]\d{6}",href)[0]
+            lst.append(re.findall(r"\d{6}",href)[0])  #加了一个[0]变成了字符类型
+        except: 
+            continue
+    return ""
+
+def getStockInfo(lst,stockURL,fpath):
+    for stock in lst:
+        url = stockURL + stock+"/gp"
+        html = getHTMLText(url)
+        try:
+            soup = BeautifulSoup(html,"html.parser")
+            stockinfo = soup.find("div",attrs={"class":"content clear"})
+            print(">")
+            if stockinfo == None:
+                    continue
+            else:
+                List = stockinfo.find_all("span")[4:]
+                name = soup.find("h1", class_="col-1-1").string
+                double = ['股票名称: ', name.string.split()[0]]
+                    double.append(List[i].string)
+                for i in range(len(double)):
+                    if double[i] == None:
+                        double[i] = '   '
+                with open(fpath,"a",encoding="utf-8")as f:
+                            f.write(str('  '.join(double)) + "\n")
+        except:
+            traceback.print_exc()
+            continue
+
+def main():
+    stock_list_url = "http://quote.eastmoney.com/stock_list.html"
+    stock_info_url = "http://gu.qq.com/sz"
+    output_file = r"C:\Users\马路\Desktop\新建文本文档.txt"
+    slist = []
+    getStockList(slist,stock_list_url)
+    getStockInfo(slist,stock_info_url,output_file)
+    print(slist)
+
+main()
