@@ -55,3 +55,55 @@ def main():
     getStockInfo(slist,stock_info_url,output_file)
 
 main()
+
+
+
+#代码优化
+def getHTMLText(url,code="utf-8"):
+    try:
+        r = requests.get(url,timeout = 30)
+        r.raise_for_status()
+        r.encoding = code
+        return r.text
+    except:
+        return ""
+def getStockList(lst,stockURL):
+    html = getHTMLText(stockURL,"GB2312")
+    soup = BeautifulSoup(html,"html.parser")
+    a = soup.find_all("a")  #寻找a标签中的股票代码
+    for i in a:
+        try:
+            href = i.attrs["href"]
+            href = re.findall(r".com/[s][hz]\d{6}",href)[0]
+            lst.append(re.findall(r"\d{6}",href)[0])  #加了一个[0]变成了字符类型
+        except:  #若a标签中没有所需字符，则continue 避免异常
+            continue
+    return ""
+def getStockInfo(lst,stockURL,fpath):
+    count = 0
+    for stock in lst:
+        url = stockURL + stock+"/gp"
+        html = getHTMLText(url)
+        try:
+            soup = BeautifulSoup(html,"html.parser")
+            stockinfo = soup.find("div",attrs={"class":"content clear"})
+            if stockinfo == None:
+                    continue
+            else:
+                List = stockinfo.find_all("span")[4:]
+                name = soup.find("h1", class_="col-1-1").string
+                double = ['股票名称: ', name.string.split()[0]] #把股票名称空格后面的其他内容删掉
+                for i in range(len(List)):
+                    double.append(List[i].string)
+                for i in range(len(double)):
+                    if double[i] == None:
+                        double[i] = '   '
+                with open(fpath,"a",encoding="utf-8")as f:
+                   f.write(str('  '.join(double)) + "\n")
+                   count = count + 1
+                   print("\r当前速度：{:.2f}%".format(count*100/len(lst)), end="")
+        except:
+            count = count + 1
+            print("\r当前速度：{:.2f}%".format(count * 100 / len(lst)), end="")
+            traceback.print_exc()
+            continue
